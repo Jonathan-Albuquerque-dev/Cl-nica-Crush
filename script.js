@@ -182,11 +182,34 @@ const canvas = document.getElementById('game-canvas');
                     const scale = 1.1;
                     const pillWidth = (TILE_SIZE / 2) * scale;
                     const pillHeight = (TILE_SIZE - PADDING) * scale;
-                    const radius = pillWidth / 2;
-                    const drawX = cursorPos.x - pillWidth / 2;
-                    const drawY = cursorPos.y - pillHeight / 2;
-                    const middleY = drawY + pillHeight / 2;
+                    
+                    const startPixelX = dragStartTile.x * TILE_SIZE + TILE_SIZE / 2;
+                    const startPixelY = dragStartTile.y * TILE_SIZE + TILE_SIZE / 2;
+                    let deltaX = cursorPos.x - startPixelX;
+                    let deltaY = cursorPos.y - startPixelY;
 
+                    let finalPixelX, finalPixelY;
+
+                    // **FIX: Lógica para restringir e limitar o movimento visual**
+                    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                        deltaY = 0; // Trava o movimento vertical
+                        // Limita o movimento horizontal a uma casa de distância
+                        deltaX = Math.max(-TILE_SIZE, Math.min(TILE_SIZE, deltaX));
+                    } else {
+                        deltaX = 0; // Trava o movimento horizontal
+                        // Limita o movimento vertical a uma casa de distância
+                        deltaY = Math.max(-TILE_SIZE, Math.min(TILE_SIZE, deltaY));
+                    }
+
+                    finalPixelX = startPixelX + deltaX;
+                    finalPixelY = startPixelY + deltaY;
+
+                    const drawX = finalPixelX - pillWidth / 2;
+                    const drawY = finalPixelY - pillHeight / 2;
+                    
+                    // Reutiliza a lógica de desenho da pílula
+                    const radius = pillWidth / 2;
+                    const middleY = drawY + pillHeight / 2;
                     ctx.fillStyle = COLORS[tileData.type];
                     ctx.fillRect(drawX, drawY + radius, pillWidth, (pillHeight / 2) - radius);
                     ctx.beginPath();
